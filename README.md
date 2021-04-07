@@ -1,0 +1,2 @@
+# configGen
+gennerate config file
