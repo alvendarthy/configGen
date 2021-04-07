@@ -1,0 +1,63 @@
+#!/bin/python3
+import configparser
+import io
+import sys
+
+class ConfigureCaseSense(configparser.ConfigParser):
+    def __init__(self,defaults=None):
+        configparser.ConfigParser.__init__(self,defaults=None)
+    def optionxform(self, optionstr):
+        return optionstr
+
+class Configure():
+    def __init__(self):
+    	#self.parser = configparser.ConfigParser()
+    	self.parser = ConfigureCaseSense()
+
+    def read(self, filename):
+        try:
+            self.parser.read(filename)
+        except:
+
+            with open(filename) as f:
+                self.parser.read_string("[default]\n" + f.read())
+
+    def items(self, section="default"):
+        self.parser.items(section)
+
+    def __rep__(self):
+        outString = io.StringIO()
+        self.parser.write(outString)
+        out = outString.getvalue().split("\n", 1)[1] or "# empty"
+        return out
+
+    def __str__(self):
+        return self.__rep__()
+
+parser = configparser.ConfigParser()
+
+conf = ""
+
+def load_file(filename):
+    try:
+        parser.read(filename)
+    except:
+        
+        with open(filename) as f:
+            parser.read_string("[default]\n" + f.read())
+            conf = parser.items("default")
+    
+
+conf = Configure()
+
+argv = sys.argv
+
+if len(argv) < 2:
+    print("need 1 config file, at least.")
+    exit(1)
+
+for conf_f in argv[1:]:
+    print(f"# Loading {conf_f}")
+    conf.read(conf_f)
+
+print(conf)
